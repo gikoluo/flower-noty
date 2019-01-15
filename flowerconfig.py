@@ -3,7 +3,8 @@
 ###################
 
 
-
+broker_url = 'amqp://guest:guest@localhost:5672//'
+result_backend = 'rpc://'
 
 #basic_auth=username:passworrd,user2:pwd2
 

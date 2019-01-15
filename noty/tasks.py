@@ -1,12 +1,17 @@
 from __future__ import absolute_import
 from celery.utils.log import get_task_logger
-from .celery import app
+from celery.task import task
 import requests
 import time
 
 logger = get_task_logger(__name__)
 
-@app.task
+
+@task
+def hello():
+    return 'hello world'
+
+@task
 def longtime_add(x, y):
     logger.info('long time task begins')
     #sleep 5 seconds
@@ -19,7 +24,7 @@ def longtime_add(x, y):
 #Retry in 5s, 30s, 1min, 5min, 1h, 24h and 48h finally.
 NOTIFICATION_COUNTDOWNS = [0, 5, 30, 60, 5*60, 60*60, 3600*24, 3600*48]
 
-@app.task(bind=True, max_retries=3)
+@task(bind=True, max_retries=len(NOTIFICATION_COUNTDOWNS))
 def remote_notify(self, remote_url, data={}, timeout=2, expect=None, method='GET', auth=None, countdowns=NOTIFICATION_COUNTDOWNS):
     logger.info('remote notify begins')
     try:
@@ -34,5 +39,7 @@ def remote_notify(self, remote_url, data={}, timeout=2, expect=None, method='GET
         else:
             logger.warn('RETRY {0}'.format(self.request.retries))
             r.raise_for_status()
-    except Exception:
-        self.retry(countdown= countdowns[self.request.retries])
+    except (ConnectionError, HTTPError, Exception) as exc:
+        self.retry(exc, countdown= countdowns[self.request.retries])
+
+
