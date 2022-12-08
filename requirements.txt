@@ -3,7 +3,7 @@ aniso8601==3.0.2
 Babel==2.6.0
 billiard==3.5.0.4
 -e git+https://github.com/celery/celery.git@bbacdfeb39a67bc05e571bddc01865f95efbbfcf#egg=celery
-certifi==2018.8.24
+certifi==2022.12.7
 chardet==3.0.4
 Click==7.0
 Django==2.1.1
